@@ -1,0 +1,250 @@
+// Color palette inspired by Nhathuoclongchau
+export const COLORS = {
+  primary: {
+    50: "#eff6ff",
+    100: "#dbeafe",
+    200: "#bfdbfe",
+    300: "#93c5fd",
+    400: "#60a5fa",
+    500: "#3b82f6",
+    600: "#2563eb",
+    700: "#1d4ed8",
+    800: "#1e40af",
+    900: "#1e3a8a",
+  },
+  blue: {
+    50: "#f0f9ff",
+    100: "#e0f2fe",
+    200: "#bae6fd",
+    300: "#7dd3fc",
+    400: "#38bdf8",
+    500: "#0ea5e9",
+    600: "#0284c7",
+    700: "#0369a1",
+    800: "#075985",
+    900: "#0c4a6e",
+  },
+}
+
+export const NAVIGATION_ITEMS = [
+  { id: "dashboard", label: "Tổng Quan", icon: "LayoutDashboard", href: "/" },
+  { id: "accounts", label: "Quản lý Tài khoản", icon: "UserCog", href: "/accounts" },
+  { id: "products", label: "Quản lý Sản phẩm", icon: "Pill", href: "/products" },
+  { id: "sales", label: "Quản lý Bán hàng", icon: "ShoppingCart", href: "/sales" },
+  { id: "invoices", label: "Quản lý Hóa đơn", icon: "Receipt", href: "/invoices" },
+  { id: "inventory", label: "Quản lý Kho", icon: "Package", href: "/inventory" },
+  { id: "suppliers", label: "Quản lý Nhà cung cấp", icon: "Truck", href: "/suppliers" },
+  { id: "reports", label: "Báo cáo Thống kê", icon: "BarChart3", href: "/reports" },
+  { id: "customers", label: "Quản lý Khách hàng", icon: "Users", href: "/customers" },
+]
+
+// Giữ nguyên key STAFF để tương thích với các phần còn dùng "staff"
+export const USER_ROLES = {
+  ADMIN: "admin",
+  MANAGER: "manager",
+  PHARMACIST: "pharmacist",
+  STAFF: "staff", // 👈 thêm lại
+  CASHIER: "cashier",
+  WAREHOUSE_STAFF: "warehouse_staff",
+} as const
+
+export const PERMISSIONS = {
+  // Account management
+  ACCOUNT_VIEW: "account:view",
+  ACCOUNT_CREATE: "account:create",
+  ACCOUNT_UPDATE: "account:update",
+  ACCOUNT_DELETE: "account:delete",
+  ACCOUNT_ASSIGN_ROLES: "account:assign_roles",
+
+  // Product management
+  PRODUCT_VIEW: "product:view",
+  PRODUCT_CREATE: "product:create",
+  PRODUCT_UPDATE: "product:update",
+  PRODUCT_DELETE: "product:delete",
+  PRODUCT_MANAGE_EXPIRY: "product:manage_expiry",
+
+  // Sales management
+  SALES_VIEW: "sales:view",
+  SALES_CREATE: "sales:create",
+  SALES_UPDATE: "sales:update",
+  SALES_DELETE: "sales:delete",
+  SALES_ONLINE: "sales:online",
+  SALES_OFFLINE: "sales:offline",
+
+  // Invoice management
+  INVOICE_VIEW: "invoice:view",
+  INVOICE_CREATE: "invoice:create",
+  INVOICE_UPDATE: "invoice:update",
+  INVOICE_DELETE: "invoice:delete",
+  INVOICE_SEARCH: "invoice:search",
+
+  // Inventory management
+  INVENTORY_VIEW: "inventory:view",
+  INVENTORY_CREATE: "inventory:create",
+  INVENTORY_UPDATE: "inventory:update",
+  INVENTORY_DELETE: "inventory:delete",
+  INVENTORY_TRACK: "inventory:track",
+
+  // Supplier management
+  SUPPLIER_VIEW: "supplier:view",
+  SUPPLIER_CREATE: "supplier:create",
+  SUPPLIER_UPDATE: "supplier:update",
+  SUPPLIER_DELETE: "supplier:delete",
+  SUPPLIER_MANAGE_CONTRACTS: "supplier:manage_contracts",
+  SUPPLIER_REQUEST_QUOTES: "supplier:request_quotes",
+
+  // Reports
+  REPORTS_VIEW: "reports:view",
+  REPORTS_EXPORT: "reports:export",
+  REPORTS_REVENUE: "reports:revenue",
+  REPORTS_PROFIT: "reports:profit",
+  REPORTS_INVENTORY: "reports:inventory",
+
+  // Customer management
+  CUSTOMER_VIEW: "customer:view",
+  CUSTOMER_CREATE: "customer:create",
+  CUSTOMER_UPDATE: "customer:update",
+  CUSTOMER_DELETE: "customer:delete",
+} as const
+
+export const ROLE_PERMISSIONS = {
+  [USER_ROLES.ADMIN]: {
+    name: "Quản trị viên",
+    color: "bg-red-100 text-red-800",
+    permissions: Object.values(PERMISSIONS),
+  },
+  [USER_ROLES.MANAGER]: {
+    name: "Quản lý",
+    color: "bg-blue-100 text-blue-800",
+    permissions: [
+      PERMISSIONS.ACCOUNT_VIEW,
+      PERMISSIONS.PRODUCT_VIEW,
+      PERMISSIONS.PRODUCT_CREATE,
+      PERMISSIONS.PRODUCT_UPDATE,
+      PERMISSIONS.PRODUCT_MANAGE_EXPIRY,
+      PERMISSIONS.SALES_VIEW,
+      PERMISSIONS.SALES_CREATE,
+      PERMISSIONS.SALES_UPDATE,
+      PERMISSIONS.INVOICE_VIEW,
+      PERMISSIONS.INVOICE_CREATE,
+      PERMISSIONS.INVOICE_UPDATE,
+      PERMISSIONS.INVENTORY_VIEW,
+      PERMISSIONS.INVENTORY_CREATE,
+      PERMISSIONS.INVENTORY_UPDATE,
+      PERMISSIONS.INVENTORY_TRACK,
+      PERMISSIONS.SUPPLIER_VIEW,
+      PERMISSIONS.SUPPLIER_CREATE,
+      PERMISSIONS.SUPPLIER_UPDATE,
+      PERMISSIONS.SUPPLIER_MANAGE_CONTRACTS,
+      PERMISSIONS.REPORTS_VIEW,
+      PERMISSIONS.REPORTS_EXPORT,
+      PERMISSIONS.CUSTOMER_VIEW,
+      PERMISSIONS.CUSTOMER_CREATE,
+      PERMISSIONS.CUSTOMER_UPDATE,
+    ],
+  },
+  [USER_ROLES.PHARMACIST]: {
+    name: "Dược sĩ",
+    color: "bg-green-100 text-green-800",
+    permissions: [
+      PERMISSIONS.PRODUCT_VIEW,
+      PERMISSIONS.PRODUCT_MANAGE_EXPIRY,
+      PERMISSIONS.SALES_VIEW,
+      PERMISSIONS.SALES_CREATE,
+      PERMISSIONS.SALES_OFFLINE,
+      PERMISSIONS.INVOICE_VIEW,
+      PERMISSIONS.INVOICE_CREATE,
+      PERMISSIONS.INVENTORY_VIEW,
+      PERMISSIONS.CUSTOMER_VIEW,
+      PERMISSIONS.CUSTOMER_CREATE,
+      PERMISSIONS.CUSTOMER_UPDATE,
+    ],
+  },
+  [USER_ROLES.CASHIER]: {
+    name: "Thu ngân",
+    color: "bg-yellow-100 text-yellow-800",
+    permissions: [
+      PERMISSIONS.PRODUCT_VIEW,
+      PERMISSIONS.SALES_VIEW,
+      PERMISSIONS.SALES_CREATE,
+      PERMISSIONS.SALES_OFFLINE,
+      PERMISSIONS.INVOICE_VIEW,
+      PERMISSIONS.INVOICE_CREATE,
+      PERMISSIONS.CUSTOMER_VIEW,
+      PERMISSIONS.CUSTOMER_CREATE,
+    ],
+  },
+  [USER_ROLES.WAREHOUSE_STAFF]: {
+    name: "Nhân viên kho",
+    color: "bg-purple-100 text-purple-800",
+    permissions: [
+      PERMISSIONS.PRODUCT_VIEW,
+      PERMISSIONS.PRODUCT_CREATE,
+      PERMISSIONS.PRODUCT_UPDATE,
+      PERMISSIONS.PRODUCT_MANAGE_EXPIRY,
+      PERMISSIONS.INVENTORY_VIEW,
+      PERMISSIONS.INVENTORY_CREATE,
+      PERMISSIONS.INVENTORY_UPDATE,
+      PERMISSIONS.INVENTORY_TRACK,
+      PERMISSIONS.SUPPLIER_VIEW,
+    ],
+  },
+  // Thêm quyền cho STAFF (nhân viên bán hàng thông thường)
+  [USER_ROLES.STAFF]: {
+    name: "Nhân viên",
+    color: "bg-gray-100 text-gray-800",
+    permissions: [
+      PERMISSIONS.SALES_VIEW,
+      PERMISSIONS.SALES_CREATE,
+      PERMISSIONS.SALES_UPDATE,
+      PERMISSIONS.SALES_DELETE,
+      PERMISSIONS.CUSTOMER_VIEW,
+      PERMISSIONS.CUSTOMER_CREATE,
+      PERMISSIONS.CUSTOMER_UPDATE,
+    ],
+  },
+}
+
+export const PERMISSION_LABELS: Record<string, string> = {
+  "account:view": "Xem tài khoản",
+  "account:create": "Tạo tài khoản",
+  "account:update": "Cập nhật tài khoản",
+  "account:delete": "Xóa tài khoản",
+  "account:assign_roles": "Gán vai trò tài khoản",
+  "product:view": "Xem sản phẩm",
+  "product:create": "Tạo sản phẩm",
+  "product:update": "Cập nhật sản phẩm",
+  "product:delete": "Xóa sản phẩm",
+  "product:manage_expiry": "Quản lý hạn sử dụng sản phẩm",
+  "sales:view": "Xem bán hàng",
+  "sales:create": "Tạo bán hàng",
+  "sales:update": "Cập nhật bán hàng",
+  "sales:delete": "Xóa bán hàng",
+  "sales:online": "Bán hàng online",
+  "sales:offline": "Bán hàng offline",
+  "invoice:view": "Xem hóa đơn",
+  "invoice:create": "Tạo hóa đơn",
+  "invoice:update": "Cập nhật hóa đơn",
+  "invoice:delete": "Xóa hóa đơn",
+  "invoice:search": "Tìm kiếm hóa đơn",
+  "inventory:view": "Xem kho",
+  "inventory:create": "Tạo kho",
+  "inventory:update": "Cập nhật kho",
+  "inventory:delete": "Xóa kho",
+  "inventory:track": "Theo dõi kho",
+  "supplier:view": "Xem nhà cung cấp",
+  "supplier:create": "Tạo nhà cung cấp",
+  "supplier:update": "Cập nhật nhà cung cấp",
+  "supplier:delete": "Xóa nhà cung cấp",
+  "supplier:manage_contracts": "Quản lý hợp đồng nhà cung cấp",
+  "supplier:request_quotes": "Yêu cầu báo giá nhà cung cấp",
+  "reports:view": "Xem báo cáo",
+  "reports:export": "Xuất báo cáo",
+  "reports:revenue": "Báo cáo doanh thu",
+  "reports:profit": "Báo cáo lợi nhuận",
+  "reports:inventory": "Báo cáo kho",
+  "customer:view": "Xem khách hàng",
+  "customer:create": "Tạo khách hàng",
+  "customer:update": "Cập nhật khách hàng",
+  "customer:delete": "Xóa khách hàng",
+}
