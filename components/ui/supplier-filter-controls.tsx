@@ -73,7 +73,7 @@ export function SupplierFilterControls({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
-              {businessTypes.map((type) => (
+              {businessTypes?.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
                 </SelectItem>
@@ -88,7 +88,7 @@ export function SupplierFilterControls({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả</SelectItem>
-              {paymentTerms.map((term) => (
+              {paymentTerms?.map((term) => (
                 <SelectItem key={term} value={term}>
                   {term}
                 </SelectItem>

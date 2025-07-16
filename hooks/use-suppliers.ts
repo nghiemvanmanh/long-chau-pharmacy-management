@@ -1,71 +1,75 @@
-"use client"
+"use client";
 
-import { useState, useCallback, useEffect } from "react"
-import { useLocalStorage } from "./use-local-storage"
+import { useState, useCallback, useEffect } from "react";
+import { useLocalStorage } from "./use-local-storage";
 
 interface Supplier {
-  id: number
-  code: string
-  name: string
-  contactPerson: string
-  phone: string
-  email: string
-  address: string
-  businessType: string
-  paymentTerms: string
-  taxCode: string
-  bankAccount?: string
-  bankName?: string
-  website?: string
-  notes?: string
-  status: "active" | "inactive" | "suspended"
-  contractCount: number
-  totalPurchases: number
-  totalDebt: number
-  lastOrderDate?: string
-  createdAt: string
-  updatedAt: string
-  rating: number
-  categories: string[]
+  id: number;
+  code: string;
+  name: string;
+  contactPerson: string;
+  representative: string;
+  phone: string;
+  email: string;
+  address: string;
+  businessType: string;
+  paymentTerms: string;
+  taxCode: string;
+  bankAccount?: string;
+  bankName?: string;
+  website?: string;
+  notes?: string;
+  status: "active" | "inactive" | "suspended";
+  contractCount: number;
+  totalPurchases: number;
+  totalDebt: number;
+  lastOrderDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  rating: number;
+  categories: string[];
 }
 
 interface Contract {
-  id: number
-  supplierId: number
-  contractNumber: string
-  title: string
-  startDate: string
-  endDate: string
-  value: number
-  status: "active" | "expired" | "terminated" | "pending"
-  paymentTerms: string
-  deliveryTerms: string
-  products: string[]
-  notes?: string
-  createdAt: string
-  updatedAt: string
-  renewalDate?: string
-  discountRate: number
+  id: number;
+  supplierId: number;
+  supplierName: string;
+  contractNumber: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  value: number;
+  status: "active" | "expired" | "terminated" | "pending";
+  paymentTerms: string;
+  deliveryTerms: string;
+  products: string[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  renewalDate?: string;
+  discountRate: number;
 }
 
 interface Transaction {
-  id: number
-  supplierId: number
-  contractId?: number
-  transactionNumber: string
-  type: "purchase" | "payment" | "refund" | "adjustment"
-  amount: number
-  description: string
-  paymentMethod: "cash" | "transfer" | "check" | "credit"
-  paymentStatus: "paid" | "pending" | "overdue" | "cancelled"
-  dueDate?: string
-  paidDate?: string
-  createdAt: string
-  updatedAt: string
-  createdBy: string
-  approvedBy?: string
-  invoiceNumber?: string
-  receiptNumber?: string
+  id: number;
+  supplierId: number;
+  supplierName: string;
+  contractId?: number;
+  transactionNumber: string;
+  type: "purchase" | "payment" | "refund" | "adjustment";
+  amount: number;
+  description: string;
+  paymentMethod: "cash" | "transfer" | "check" | "credit";
+  paymentStatus: "paid" | "pending" | "overdue" | "cancelled";
+  date: string;
+  dueDate?: string;
+  paidDate?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  approvedBy?: string;
+  invoiceNumber?: string;
+  receiptNumber?: string;
 }
 
 // Initial suppliers data
@@ -75,6 +79,7 @@ const initialSuppliers: Supplier[] = [
     code: "NCC001",
     name: "Công ty Dược Hà Tây",
     contactPerson: "Nguyễn Văn Minh",
+    representative: "Nguyễn Văn Minh",
     phone: "024-3856-7890",
     email: "info@duochatay.com",
     address: "123 Đường Láng, Đống Đa, Hà Nội",
@@ -100,6 +105,7 @@ const initialSuppliers: Supplier[] = [
     code: "NCC002",
     name: "Công ty Dược Sài Gòn",
     contactPerson: "Trần Thị Lan",
+    representative: "Trần Thị Lan",
     phone: "028-3925-6789",
     email: "contact@duocsaigon.com",
     address: "456 Nguyễn Trãi, Quận 5, TP.HCM",
@@ -124,6 +130,7 @@ const initialSuppliers: Supplier[] = [
     code: "NCC003",
     name: "Công ty Dược Miền Trung",
     contactPerson: "Lê Văn Hùng",
+    representative: "Lê Văn Hùng",
     phone: "0236-3567-890",
     email: "sales@duocmientrung.com",
     address: "789 Lê Duẩn, Hải Châu, Đà Nẵng",
@@ -141,13 +148,14 @@ const initialSuppliers: Supplier[] = [
     categories: ["Thuốc truyền thống"],
     notes: "Tạm ngừng hợp tác",
   },
-]
+];
 
 // Initial contracts data
 const initialContracts: Contract[] = [
   {
     id: 1,
     supplierId: 1,
+    supplierName: "Công ty Dược Hà Tây",
     contractNumber: "HD001-2024",
     title: "Hợp đồng cung cấp thuốc kê đơn",
     startDate: "2024-01-01",
@@ -166,6 +174,7 @@ const initialContracts: Contract[] = [
   {
     id: 2,
     supplierId: 1,
+    supplierName: "Công ty Dược Hà Tây",
     contractNumber: "HD002-2024",
     title: "Hợp đồng cung cấp vitamin",
     startDate: "2024-02-01",
@@ -183,6 +192,7 @@ const initialContracts: Contract[] = [
   {
     id: 3,
     supplierId: 2,
+    supplierName: "Công ty Dược Sài Gòn",
     contractNumber: "HD003-2024",
     title: "Hợp đồng cung cấp kháng sinh",
     startDate: "2024-01-15",
@@ -197,13 +207,14 @@ const initialContracts: Contract[] = [
     updatedAt: "2024-01-15",
     notes: "Hợp đồng thử nghiệm",
   },
-]
+];
 
 // Initial transactions data
 const initialTransactions: Transaction[] = [
   {
     id: 1,
     supplierId: 1,
+    supplierName: "Công ty Dược Hà Tây",
     contractId: 1,
     transactionNumber: "GD001",
     type: "purchase",
@@ -211,6 +222,7 @@ const initialTransactions: Transaction[] = [
     description: "Mua thuốc kê đơn tháng 1",
     paymentMethod: "transfer",
     paymentStatus: "paid",
+    date: "2024-01-15",
     paidDate: "2024-01-20",
     createdAt: "2024-01-15",
     updatedAt: "2024-01-20",
@@ -222,6 +234,7 @@ const initialTransactions: Transaction[] = [
   {
     id: 2,
     supplierId: 1,
+    supplierName: "Công ty Dược Hà Tây",
     contractId: 1,
     transactionNumber: "GD002",
     type: "purchase",
@@ -229,6 +242,7 @@ const initialTransactions: Transaction[] = [
     description: "Mua thuốc bổ sung",
     paymentMethod: "transfer",
     paymentStatus: "pending",
+    date: "2024-01-16",
     dueDate: "2024-02-15",
     createdAt: "2024-01-16",
     updatedAt: "2024-01-16",
@@ -238,6 +252,7 @@ const initialTransactions: Transaction[] = [
   {
     id: 3,
     supplierId: 2,
+    supplierName: "Công ty Dược Sài Gòn",
     contractId: 3,
     transactionNumber: "GD003",
     type: "payment",
@@ -245,6 +260,7 @@ const initialTransactions: Transaction[] = [
     description: "Thanh toán tiền hàng tháng 12",
     paymentMethod: "transfer",
     paymentStatus: "paid",
+    date: "2024-01-05",
     paidDate: "2024-01-10",
     createdAt: "2024-01-05",
     updatedAt: "2024-01-10",
@@ -252,59 +268,101 @@ const initialTransactions: Transaction[] = [
     approvedBy: "Nguyễn Văn An",
     receiptNumber: "REC002",
   },
-]
+];
 
 export function useSuppliers() {
-  const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>("pharmacy-suppliers", initialSuppliers)
-  const [contracts, setContracts] = useLocalStorage<Contract[]>("pharmacy-contracts", initialContracts)
-  const [transactions, setTransactions] = useLocalStorage<Transaction[]>("pharmacy-transactions", initialTransactions)
-  const [loading, setLoading] = useState(false)
+  const [suppliers, setSuppliers] = useLocalStorage<Supplier[]>(
+    "pharmacy-suppliers",
+    initialSuppliers
+  );
+  const [contracts, setContracts] = useLocalStorage<Contract[]>(
+    "pharmacy-contracts",
+    initialContracts
+  );
+  const [transactions, setTransactions] = useLocalStorage<Transaction[]>(
+    "pharmacy-transactions",
+    initialTransactions
+  );
+  const [loading, setLoading] = useState(false);
 
   // Listen for real-time updates
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "pharmacy-suppliers" && e.newValue) {
         try {
-          setSuppliers(JSON.parse(e.newValue))
+          setSuppliers(JSON.parse(e.newValue));
         } catch (error) {
-          console.error("Error parsing suppliers:", error)
+          console.error("Error parsing suppliers:", error);
         }
       }
       if (e.key === "pharmacy-contracts" && e.newValue) {
         try {
-          setContracts(JSON.parse(e.newValue))
+          setContracts(JSON.parse(e.newValue));
         } catch (error) {
-          console.error("Error parsing contracts:", error)
+          console.error("Error parsing contracts:", error);
         }
       }
       if (e.key === "pharmacy-transactions" && e.newValue) {
         try {
-          setTransactions(JSON.parse(e.newValue))
+          setTransactions(JSON.parse(e.newValue));
         } catch (error) {
-          console.error("Error parsing transactions:", error)
+          console.error("Error parsing transactions:", error);
         }
       }
-    }
+    };
 
-    window.addEventListener("storage", handleStorageChange)
-    return () => window.removeEventListener("storage", handleStorageChange)
-  }, [setSuppliers, setContracts, setTransactions])
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [setSuppliers, setContracts, setTransactions]);
+
+  // Business types and payment terms constants
+  const businessTypes = [
+    "Nhà sản xuất",
+    "Nhà phân phối",
+    "Nhà nhập khẩu",
+    "Đại lý",
+    "Nhà cung cấp thiết bị",
+    "Nhà cung cấp bao bì",
+    "Nhà cung cấp nguyên liệu",
+    "Khác",
+  ];
+
+  const paymentTerms = [
+    "Thanh toán ngay",
+    "7 ngày",
+    "15 ngày",
+    "30 ngày",
+    "45 ngày",
+    "60 ngày",
+    "90 ngày",
+    "Theo thỏa thuận",
+  ];
 
   // Supplier CRUD operations
   const addSupplier = useCallback(
     async (
-      supplierData: Omit<Supplier, "id" | "createdAt" | "updatedAt" | "contractCount" | "totalPurchases" | "totalDebt">,
+      supplierData: Omit<
+        Supplier,
+        | "id"
+        | "createdAt"
+        | "updatedAt"
+        | "contractCount"
+        | "totalPurchases"
+        | "totalDebt"
+      >
     ) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        const existingSupplier = suppliers.find((s) => s.code === supplierData.code)
+        const existingSupplier = suppliers.find(
+          (s) => s.code === supplierData.code
+        );
         if (existingSupplier) {
-          return { success: false, error: "Mã nhà cung cấp đã tồn tại" }
+          return { success: false, error: "Mã nhà cung cấp đã tồn tại" };
         }
 
-        const now = new Date().toISOString()
+        const now = new Date().toISOString();
         const newSupplier: Supplier = {
           ...supplierData,
           id: Math.max(...suppliers.map((s) => s.id), 0) + 1,
@@ -313,26 +371,26 @@ export function useSuppliers() {
           totalDebt: 0,
           createdAt: now,
           updatedAt: now,
-        }
+        };
 
-        const updatedSuppliers = [...suppliers, newSupplier]
-        setSuppliers(updatedSuppliers)
+        const updatedSuppliers = [...suppliers, newSupplier];
+        setSuppliers(updatedSuppliers);
 
-        return { success: true, data: newSupplier }
+        return { success: true, data: newSupplier };
       } catch (error) {
-        return { success: false, error: "Không thể thêm nhà cung cấp" }
+        return { success: false, error: "Không thể thêm nhà cung cấp" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [suppliers, setSuppliers],
-  )
+    [suppliers, setSuppliers]
+  );
 
   const updateSupplier = useCallback(
     async (id: number, supplierData: Partial<Supplier>) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 400))
+        await new Promise((resolve) => setTimeout(resolve, 400));
 
         const updatedSuppliers = suppliers.map((supplier) =>
           supplier.id === id
@@ -341,86 +399,112 @@ export function useSuppliers() {
                 ...supplierData,
                 updatedAt: new Date().toISOString(),
               }
-            : supplier,
-        )
+            : supplier
+        );
 
-        setSuppliers(updatedSuppliers)
-        return { success: true }
+        setSuppliers(updatedSuppliers);
+        return { success: true };
       } catch (error) {
-        return { success: false, error: "Không thể cập nhật nhà cung cấp" }
+        return { success: false, error: "Không thể cập nhật nhà cung cấp" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [suppliers, setSuppliers],
-  )
+    [suppliers, setSuppliers]
+  );
 
   const deleteSupplier = useCallback(
     async (id: number) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 300))
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
         // Delete related contracts and transactions
-        const updatedContracts = contracts.filter((contract) => contract.supplierId !== id)
-        const updatedTransactions = transactions.filter((transaction) => transaction.supplierId !== id)
-        const updatedSuppliers = suppliers.filter((supplier) => supplier.id !== id)
+        const updatedContracts = contracts.filter(
+          (contract) => contract.supplierId !== id
+        );
+        const updatedTransactions = transactions.filter(
+          (transaction) => transaction.supplierId !== id
+        );
+        const updatedSuppliers = suppliers.filter(
+          (supplier) => supplier.id !== id
+        );
 
-        setContracts(updatedContracts)
-        setTransactions(updatedTransactions)
-        setSuppliers(updatedSuppliers)
+        setContracts(updatedContracts);
+        setTransactions(updatedTransactions);
+        setSuppliers(updatedSuppliers);
 
-        return { success: true }
+        return { success: true };
       } catch (error) {
-        return { success: false, error: "Không thể xóa nhà cung cấp" }
+        return { success: false, error: "Không thể xóa nhà cung cấp" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [suppliers, contracts, transactions, setSuppliers, setContracts, setTransactions],
-  )
+    [
+      suppliers,
+      contracts,
+      transactions,
+      setSuppliers,
+      setContracts,
+      setTransactions,
+    ]
+  );
 
   // Contract CRUD operations
   const addContract = useCallback(
-    async (contractData: Omit<Contract, "id" | "createdAt" | "updatedAt">) => {
-      setLoading(true)
+    async (
+      contractData: Omit<
+        Contract,
+        "id" | "createdAt" | "updatedAt" | "supplierName"
+      >
+    ) => {
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        const now = new Date().toISOString()
+        const now = new Date().toISOString();
+        const supplier = suppliers.find(
+          (s) => s.id === contractData.supplierId
+        );
         const newContract: Contract = {
           ...contractData,
           id: Math.max(...contracts.map((c) => c.id), 0) + 1,
+          supplierName: supplier?.name || "",
           createdAt: now,
           updatedAt: now,
-        }
+        };
 
-        const updatedContracts = [...contracts, newContract]
-        setContracts(updatedContracts)
+        const updatedContracts = [...contracts, newContract];
+        setContracts(updatedContracts);
 
         // Update supplier contract count
         const updatedSuppliers = suppliers.map((supplier) =>
           supplier.id === contractData.supplierId
-            ? { ...supplier, contractCount: supplier.contractCount + 1, updatedAt: now }
-            : supplier,
-        )
-        setSuppliers(updatedSuppliers)
+            ? {
+                ...supplier,
+                contractCount: supplier.contractCount + 1,
+                updatedAt: now,
+              }
+            : supplier
+        );
+        setSuppliers(updatedSuppliers);
 
-        return { success: true, data: newContract }
+        return { success: true, data: newContract };
       } catch (error) {
-        return { success: false, error: "Không thể thêm hợp đồng" }
+        return { success: false, error: "Không thể thêm hợp đồng" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [contracts, suppliers, setContracts, setSuppliers],
-  )
+    [contracts, suppliers, setContracts, setSuppliers]
+  );
 
   const updateContract = useCallback(
     async (id: number, contractData: Partial<Contract>) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 400))
+        await new Promise((resolve) => setTimeout(resolve, 400));
 
         const updatedContracts = contracts.map((contract) =>
           contract.id === id
@@ -429,34 +513,39 @@ export function useSuppliers() {
                 ...contractData,
                 updatedAt: new Date().toISOString(),
               }
-            : contract,
-        )
+            : contract
+        );
 
-        setContracts(updatedContracts)
-        return { success: true }
+        setContracts(updatedContracts);
+        return { success: true };
       } catch (error) {
-        return { success: false, error: "Không thể cập nhật hợp đồng" }
+        return { success: false, error: "Không thể cập nhật hợp đồng" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [contracts, setContracts],
-  )
+    [contracts, setContracts]
+  );
 
   const deleteContract = useCallback(
     async (id: number) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 300))
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
-        const contractToDelete = contracts.find((c) => c.id === id)
-        if (!contractToDelete) return { success: false, error: "Không tìm thấy hợp đồng" }
+        const contractToDelete = contracts.find((c) => c.id === id);
+        if (!contractToDelete)
+          return { success: false, error: "Không tìm thấy hợp đồng" };
 
-        const updatedContracts = contracts.filter((contract) => contract.id !== id)
-        const updatedTransactions = transactions.filter((transaction) => transaction.contractId !== id)
+        const updatedContracts = contracts.filter(
+          (contract) => contract.id !== id
+        );
+        const updatedTransactions = transactions.filter(
+          (transaction) => transaction.contractId !== id
+        );
 
-        setContracts(updatedContracts)
-        setTransactions(updatedTransactions)
+        setContracts(updatedContracts);
+        setTransactions(updatedTransactions);
 
         // Update supplier contract count
         const updatedSuppliers = suppliers.map((supplier) =>
@@ -466,86 +555,113 @@ export function useSuppliers() {
                 contractCount: Math.max(0, supplier.contractCount - 1),
                 updatedAt: new Date().toISOString(),
               }
-            : supplier,
-        )
-        setSuppliers(updatedSuppliers)
+            : supplier
+        );
+        setSuppliers(updatedSuppliers);
 
-        return { success: true }
+        return { success: true };
       } catch (error) {
-        return { success: false, error: "Không thể xóa hợp đồng" }
+        return { success: false, error: "Không thể xóa hợp đồng" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [contracts, transactions, suppliers, setContracts, setTransactions, setSuppliers],
-  )
+    [
+      contracts,
+      transactions,
+      suppliers,
+      setContracts,
+      setTransactions,
+      setSuppliers,
+    ]
+  );
 
   // Transaction CRUD operations
   const addTransaction = useCallback(
-    async (transactionData: Omit<Transaction, "id" | "createdAt" | "updatedAt" | "transactionNumber">) => {
-      setLoading(true)
+    async (
+      transactionData: Omit<
+        Transaction,
+        "id" | "createdAt" | "updatedAt" | "transactionNumber" | "supplierName"
+      >
+    ) => {
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        const now = new Date().toISOString()
-        const transactionNumber = `GD${Date.now().toString().slice(-6)}`
+        const now = new Date().toISOString();
+        const transactionNumber = `GD${Date.now().toString().slice(-6)}`;
+        const supplier = suppliers.find(
+          (s) => s.id === transactionData.supplierId
+        );
 
         const newTransaction: Transaction = {
           ...transactionData,
           id: Math.max(...transactions.map((t) => t.id), 0) + 1,
           transactionNumber,
+          supplierName: supplier?.name || "",
+          date: transactionData.date || now.split("T")[0],
           createdAt: now,
           updatedAt: now,
-        }
+        };
 
-        const updatedTransactions = [...transactions, newTransaction]
-        setTransactions(updatedTransactions)
+        const updatedTransactions = [...transactions, newTransaction];
+        setTransactions(updatedTransactions);
 
         // Update supplier totals
         const updatedSuppliers = suppliers.map((supplier) => {
           if (supplier.id === transactionData.supplierId) {
-            let newTotalPurchases = supplier.totalPurchases
-            let newTotalDebt = supplier.totalDebt
+            let newTotalPurchases = supplier.totalPurchases;
+            let newTotalDebt = supplier.totalDebt;
 
             if (transactionData.type === "purchase") {
-              newTotalPurchases += transactionData.amount
-              if (transactionData.paymentStatus === "pending" || transactionData.paymentStatus === "overdue") {
-                newTotalDebt += transactionData.amount
+              newTotalPurchases += transactionData.amount;
+              if (
+                transactionData.paymentStatus === "pending" ||
+                transactionData.paymentStatus === "overdue"
+              ) {
+                newTotalDebt += transactionData.amount;
               }
-            } else if (transactionData.type === "payment" && transactionData.paymentStatus === "paid") {
-              newTotalDebt = Math.max(0, newTotalDebt - transactionData.amount)
+            } else if (
+              transactionData.type === "payment" &&
+              transactionData.paymentStatus === "paid"
+            ) {
+              newTotalDebt = Math.max(0, newTotalDebt - transactionData.amount);
             }
 
             return {
               ...supplier,
               totalPurchases: newTotalPurchases,
               totalDebt: newTotalDebt,
-              lastOrderDate: transactionData.type === "purchase" ? now.split("T")[0] : supplier.lastOrderDate,
+              lastOrderDate:
+                transactionData.type === "purchase"
+                  ? now.split("T")[0]
+                  : supplier.lastOrderDate,
               updatedAt: now,
-            }
+            };
           }
-          return supplier
-        })
-        setSuppliers(updatedSuppliers)
+          return supplier;
+        });
+        setSuppliers(updatedSuppliers);
 
-        return { success: true, data: newTransaction }
+        return { success: true, data: newTransaction };
       } catch (error) {
-        return { success: false, error: "Không thể thêm giao dịch" }
+        return { success: false, error: "Không thể thêm giao dịch" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [transactions, suppliers, setTransactions, setSuppliers],
-  )
+    [transactions, suppliers, setTransactions, setSuppliers]
+  );
 
   const updateTransaction = useCallback(
     async (id: number, transactionData: Partial<Transaction>) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 400))
+        await new Promise((resolve) => setTimeout(resolve, 400));
 
-        const oldTransaction = transactions.find((t) => t.id === id)
-        if (!oldTransaction) return { success: false, error: "Không tìm thấy giao dịch" }
+        const oldTransaction = transactions.find((t) => t.id === id);
+        if (!oldTransaction)
+          return { success: false, error: "Không tìm thấy giao dịch" };
 
         const updatedTransactions = transactions.map((transaction) =>
           transaction.id === id
@@ -554,69 +670,93 @@ export function useSuppliers() {
                 ...transactionData,
                 updatedAt: new Date().toISOString(),
               }
-            : transaction,
-        )
+            : transaction
+        );
 
-        setTransactions(updatedTransactions)
+        setTransactions(updatedTransactions);
 
         // Update supplier debt if payment status changed
-        if (transactionData.paymentStatus && transactionData.paymentStatus !== oldTransaction.paymentStatus) {
+        if (
+          transactionData.paymentStatus &&
+          transactionData.paymentStatus !== oldTransaction.paymentStatus
+        ) {
           const updatedSuppliers = suppliers.map((supplier) => {
             if (supplier.id === oldTransaction.supplierId) {
-              let newTotalDebt = supplier.totalDebt
+              let newTotalDebt = supplier.totalDebt;
 
-              if (oldTransaction.paymentStatus === "pending" && transactionData.paymentStatus === "paid") {
-                newTotalDebt = Math.max(0, newTotalDebt - oldTransaction.amount)
-              } else if (oldTransaction.paymentStatus === "paid" && transactionData.paymentStatus === "pending") {
-                newTotalDebt += oldTransaction.amount
+              if (
+                oldTransaction.paymentStatus === "pending" &&
+                transactionData.paymentStatus === "paid"
+              ) {
+                newTotalDebt = Math.max(
+                  0,
+                  newTotalDebt - oldTransaction.amount
+                );
+              } else if (
+                oldTransaction.paymentStatus === "paid" &&
+                transactionData.paymentStatus === "pending"
+              ) {
+                newTotalDebt += oldTransaction.amount;
               }
 
               return {
                 ...supplier,
                 totalDebt: newTotalDebt,
                 updatedAt: new Date().toISOString(),
-              }
+              };
             }
-            return supplier
-          })
-          setSuppliers(updatedSuppliers)
+            return supplier;
+          });
+          setSuppliers(updatedSuppliers);
         }
 
-        return { success: true }
+        return { success: true };
       } catch (error) {
-        return { success: false, error: "Không thể cập nhật giao dịch" }
+        return { success: false, error: "Không thể cập nhật giao dịch" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [transactions, suppliers, setTransactions, setSuppliers],
-  )
+    [transactions, suppliers, setTransactions, setSuppliers]
+  );
 
   const deleteTransaction = useCallback(
     async (id: number) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 300))
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
-        const transactionToDelete = transactions.find((t) => t.id === id)
-        if (!transactionToDelete) return { success: false, error: "Không tìm thấy giao dịch" }
+        const transactionToDelete = transactions.find((t) => t.id === id);
+        if (!transactionToDelete)
+          return { success: false, error: "Không tìm thấy giao dịch" };
 
-        const updatedTransactions = transactions.filter((transaction) => transaction.id !== id)
-        setTransactions(updatedTransactions)
+        const updatedTransactions = transactions.filter(
+          (transaction) => transaction.id !== id
+        );
+        setTransactions(updatedTransactions);
 
         // Update supplier totals
         const updatedSuppliers = suppliers.map((supplier) => {
           if (supplier.id === transactionToDelete.supplierId) {
-            let newTotalPurchases = supplier.totalPurchases
-            let newTotalDebt = supplier.totalDebt
+            let newTotalPurchases = supplier.totalPurchases;
+            let newTotalDebt = supplier.totalDebt;
 
             if (transactionToDelete.type === "purchase") {
-              newTotalPurchases = Math.max(0, newTotalPurchases - transactionToDelete.amount)
-              if (transactionToDelete.paymentStatus === "pending" || transactionToDelete.paymentStatus === "overdue") {
-                newTotalDebt = Math.max(0, newTotalDebt - transactionToDelete.amount)
+              newTotalPurchases = Math.max(
+                0,
+                newTotalPurchases - transactionToDelete.amount
+              );
+              if (
+                transactionToDelete.paymentStatus === "pending" ||
+                transactionToDelete.paymentStatus === "overdue"
+              ) {
+                newTotalDebt = Math.max(
+                  0,
+                  newTotalDebt - transactionToDelete.amount
+                );
               }
             } else if (transactionToDelete.type === "payment") {
-              newTotalDebt += transactionToDelete.amount
+              newTotalDebt += transactionToDelete.amount;
             }
 
             return {
@@ -624,33 +764,43 @@ export function useSuppliers() {
               totalPurchases: newTotalPurchases,
               totalDebt: newTotalDebt,
               updatedAt: new Date().toISOString(),
-            }
+            };
           }
-          return supplier
-        })
-        setSuppliers(updatedSuppliers)
+          return supplier;
+        });
+        setSuppliers(updatedSuppliers);
 
-        return { success: true }
+        return { success: true };
       } catch (error) {
-        return { success: false, error: "Không thể xóa giao dịch" }
+        return { success: false, error: "Không thể xóa giao dịch" };
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     },
-    [transactions, suppliers, setTransactions, setSuppliers],
-  )
+    [transactions, suppliers, setTransactions, setSuppliers]
+  );
 
   // Statistics
   const getSupplierStats = useCallback(() => {
-    const activeSuppliers = suppliers.filter((s) => s.status === "active").length
-    const totalContracts = contracts.length
-    const activeContracts = contracts.filter((c) => c.status === "active").length
-    const totalPurchases = suppliers.reduce((sum, s) => sum + s.totalPurchases, 0)
-    const totalDebt = suppliers.reduce((sum, s) => sum + s.totalDebt, 0)
+    const activeSuppliers = suppliers.filter(
+      (s) => s.status === "active"
+    ).length;
+    const totalContracts = contracts.length;
+    const activeContracts = contracts.filter(
+      (c) => c.status === "active"
+    ).length;
+    const totalPurchases = suppliers.reduce(
+      (sum, s) => sum + s.totalPurchases,
+      0
+    );
+    const totalDebt = suppliers.reduce((sum, s) => sum + s.totalDebt, 0);
+    const pendingTransactions = transactions.filter(
+      (t) => t.paymentStatus === "pending"
+    ).length;
     const overdueTransactions = transactions.filter((t) => {
-      if (t.paymentStatus !== "overdue") return false
-      return t.dueDate && new Date(t.dueDate) < new Date()
-    }).length
+      if (t.paymentStatus !== "overdue") return false;
+      return t.dueDate && new Date(t.dueDate) < new Date();
+    }).length;
 
     return {
       totalSuppliers: suppliers.length,
@@ -659,15 +809,22 @@ export function useSuppliers() {
       activeContracts,
       totalPurchases,
       totalDebt,
+      pendingTransactions,
       overdueTransactions,
-    }
-  }, [suppliers, contracts, transactions])
+    };
+  }, [suppliers, contracts, transactions]);
+
+  // Get stats
+  const stats = getSupplierStats();
 
   return {
     suppliers,
     contracts,
     transactions,
     loading,
+    stats,
+    businessTypes,
+    paymentTerms,
     addSupplier,
     updateSupplier,
     deleteSupplier,
@@ -678,5 +835,5 @@ export function useSuppliers() {
     updateTransaction,
     deleteTransaction,
     getSupplierStats,
-  }
+  };
 }

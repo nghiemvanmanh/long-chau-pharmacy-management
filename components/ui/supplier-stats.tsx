@@ -19,15 +19,15 @@ export function SupplierStats({ stats }: SupplierStatsProps) {
   const statItems = [
     {
       title: "Tổng nhà cung cấp",
-      value: stats.totalSuppliers.toString(),
+      value: stats?.totalSuppliers.toString(),
       icon: Truck,
       color: "text-blue-600",
       bgColor: "bg-blue-100",
-      description: `${stats.activeSuppliers} đang hoạt động`,
+      description: `${stats?.activeSuppliers} đang hoạt động`,
     },
     {
       title: "Hợp đồng hiệu lực",
-      value: stats.activeContracts.toString(),
+      value: stats?.activeContracts.toString(),
       icon: FileText,
       color: "text-green-600",
       bgColor: "bg-green-100",
@@ -35,7 +35,7 @@ export function SupplierStats({ stats }: SupplierStatsProps) {
     },
     {
       title: "Tổng mua hàng",
-      value: `${stats.totalPurchases.toLocaleString()} ₫`,
+      value: `${stats?.totalPurchases.toLocaleString()} ₫`,
       icon: TrendingUp,
       color: "text-purple-600",
       bgColor: "bg-purple-100",
@@ -43,15 +43,15 @@ export function SupplierStats({ stats }: SupplierStatsProps) {
     },
     {
       title: "Công nợ",
-      value: `${stats.totalDebt.toLocaleString()} ₫`,
+      value: `${stats?.totalDebt.toLocaleString()} ₫`,
       icon: DollarSign,
-      color: stats.totalDebt > 0 ? "text-red-600" : "text-green-600",
-      bgColor: stats.totalDebt > 0 ? "bg-red-100" : "bg-green-100",
+      color: stats?.totalDebt > 0 ? "text-red-600" : "text-green-600",
+      bgColor: stats?.totalDebt > 0 ? "bg-red-100" : "bg-green-100",
       description: "Tổng công nợ hiện tại",
     },
     {
       title: "GD chờ thanh toán",
-      value: stats.pendingTransactions.toString(),
+      value: stats?.pendingTransactions.toString(),
       icon: Calendar,
       color: "text-orange-600",
       bgColor: "bg-orange-100",
@@ -59,7 +59,7 @@ export function SupplierStats({ stats }: SupplierStatsProps) {
     },
     {
       title: "Cảnh báo",
-      value: (stats.totalSuppliers - stats.activeSuppliers).toString(),
+      value: (stats?.totalSuppliers - stats?.activeSuppliers).toString(),
       icon: AlertTriangle,
       color: "text-yellow-600",
       bgColor: "bg-yellow-100",
@@ -69,7 +69,7 @@ export function SupplierStats({ stats }: SupplierStatsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-      {statItems.map((stat, index) => {
+      {statItems?.map((stat, index) => {
         const Icon = stat.icon
         return (
           <motion.div
