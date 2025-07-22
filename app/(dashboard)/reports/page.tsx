@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   BarChart3,
   TrendingUp,
@@ -23,12 +29,12 @@ import {
   PieChart,
   Activity,
   Truck,
-} from "lucide-react"
-import { StatsCard } from "@/components/ui/stats-card"
-import { PageHeader } from "@/components/ui/page-header"
-import { ChartCard } from "@/components/ui/chart-card"
-import { useReports } from "@/hooks/use-reports"
-import { useToast } from "@/hooks/use-toast"
+} from "lucide-react";
+import { StatsCard } from "@/components/ui/stats-card";
+import { PageHeader } from "@/components/ui/page-header";
+import { ChartCard } from "@/components/ui/chart-card";
+import { useReports } from "@/hooks/use-reports";
+import { useToast } from "@/hooks/use-toast";
 
 function KPISection({ kpis }: { kpis: any }) {
   const kpiCards = [
@@ -80,7 +86,7 @@ function KPISection({ kpis }: { kpis: any }) {
       color: "text-emerald-600",
       bgColor: "bg-emerald-100",
     },
-  ]
+  ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -88,61 +94,127 @@ function KPISection({ kpis }: { kpis: any }) {
         <StatsCard key={kpi.title} {...kpi} index={index} />
       ))}
     </div>
-  )
+  );
 }
 
 function SalesAnalytics({ reportData }: { reportData: any }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Doanh thu theo ngày" icon={BarChart3} iconColor="text-blue-600" delay={0.2}>
+        <ChartCard
+          title="Doanh thu theo ngày"
+          icon={BarChart3}
+          iconColor="text-blue-600"
+          delay={0.2}
+        >
           <div className="space-y-4">
-            {reportData.dailySales.slice(-7).map((data: any, index: number) => (
-              <div key={data.date} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-8 bg-blue-100 rounded flex items-center justify-center">
-                    <span className="text-sm font-semibold text-blue-600">{new Date(data.date).getDate()}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{data.revenue.toLocaleString()} ₫</p>
-                    <p className="text-sm text-gray-500">{data.orders} đơn hàng</p>
-                  </div>
-                </div>
-                <div className="w-24 bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${(data.revenue / Math.max(...reportData.dailySales.map((d: any) => d.revenue))) * 100}%`,
-                    }}
-                  />
-                </div>
+            {reportData.dailySales && reportData.dailySales.length > 0 ? (
+              reportData.dailySales
+                .slice(-7)
+                .map((data: any, index: number) => {
+                  const maxRevenue = Math.max(
+                    ...reportData.dailySales.map((d: any) => d.revenue || 0)
+                  );
+                  const progressWidth =
+                    maxRevenue > 0
+                      ? ((data.revenue || 0) / maxRevenue) * 100
+                      : 0;
+
+                  return (
+                    <div
+                      key={data.date || index}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-8 bg-blue-100 rounded flex items-center justify-center">
+                          <span className="text-sm font-semibold text-blue-600">
+                            {data.date
+                              ? new Date(data.date).getDate()
+                              : index + 1}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {(data.revenue || 0).toLocaleString()} ₫
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {data.orders || 0} đơn hàng
+                          </p>
+                        </div>
+                      </div>
+                      <div className="w-24 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${progressWidth}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Không có dữ liệu doanh thu hàng ngày</p>
               </div>
-            ))}
+            )}
           </div>
         </ChartCard>
 
-        <ChartCard title="Sản phẩm bán chạy nhất" icon={TrendingUp} iconColor="text-green-600" delay={0.3}>
+        <ChartCard
+          title="Sản phẩm bán chạy nhất"
+          icon={TrendingUp}
+          iconColor="text-green-600"
+          delay={0.3}
+        >
           <div className="space-y-4">
-            {reportData.topProducts.slice(0, 5).map((product: any, index: number) => (
-              <div key={product.name} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-semibold text-green-600">{index + 1}</span>
+            {reportData.topProducts && reportData.topProducts.length > 0 ? (
+              reportData.topProducts
+                .slice(0, 5)
+                .map((product: any, index: number) => (
+                  <div
+                    key={product.name || index}
+                    className="flex items-center justify-between"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold text-green-600">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {product.name || "Sản phẩm không xác định"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {product.sold || 0} đã bán
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-green-600">
+                        {(product.revenue || 0).toLocaleString()} ₫
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          (product.growth || 0) >= 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {(product.growth || 0) >= 0 ? "+" : ""}
+                        {(product.growth || 0).toFixed(1)}%
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{product.name}</p>
-                    <p className="text-sm text-gray-500">{product.sold} đã bán</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-green-600">{product.revenue.toLocaleString()} ₫</p>
-                  <p className={`text-sm ${product.growth >= 0 ? "text-green-600" : "text-red-600"}`}>
-                    {product.growth >= 0 ? "+" : ""}
-                    {product.growth.toFixed(1)}%
-                  </p>
-                </div>
+                ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Không có dữ liệu sản phẩm bán chạy</p>
               </div>
-            ))}
+            )}
           </div>
         </ChartCard>
       </div>
@@ -155,177 +227,333 @@ function SalesAnalytics({ reportData }: { reportData: any }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reportData.revenueByPaymentMethod.map((method: any, index: number) => (
-              <div key={method.method} className="text-center">
-                <div className="relative w-20 h-20 mx-auto mb-4">
-                  <div className="w-full h-full bg-gray-200 rounded-full">
-                    <div
-                      className="rounded-full transition-all duration-1000 flex items-center justify-center text-white font-semibold"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        background: `conic-gradient(${
-                          index === 0 ? "#3b82f6" : index === 1 ? "#10b981" : "#f59e0b"
-                        } 0deg ${method.percentage * 3.6}deg, #e5e7eb ${method.percentage * 3.6}deg 360deg)`,
-                      }}
-                    >
-                      <span className="text-sm">{method.percentage}%</span>
+          {reportData.revenueByPaymentMethod &&
+          reportData.revenueByPaymentMethod.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {reportData.revenueByPaymentMethod.map(
+                (method: any, index: number) => (
+                  <div key={method.method || index} className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-4">
+                      <div className="w-full h-full bg-gray-200 rounded-full">
+                        <div
+                          className="rounded-full transition-all duration-1000 flex items-center justify-center text-white font-semibold"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            background: `conic-gradient(${
+                              index === 0
+                                ? "#3b82f6"
+                                : index === 1
+                                ? "#10b981"
+                                : "#f59e0b"
+                            } 0deg ${
+                              (method.percentage || 0) * 3.6
+                            }deg, #e5e7eb ${
+                              (method.percentage || 0) * 3.6
+                            }deg 360deg)`,
+                          }}
+                        >
+                          <span className="text-sm">
+                            {method.percentage || 0}%
+                          </span>
+                        </div>
+                      </div>
                     </div>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      {method.method || "Không xác định"}
+                    </h3>
+                    <p className="text-sm font-semibold text-blue-600">
+                      {(method.amount || 0).toLocaleString()} ₫
+                    </p>
                   </div>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{method.method}</h3>
-                <p className="text-sm font-semibold text-blue-600">{method.amount.toLocaleString()} ₫</p>
-              </div>
-            ))}
-          </div>
+                )
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <PieChart className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>Không có dữ liệu phương thức thanh toán</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function InventoryAnalytics({ reportData }: { reportData: any }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Tình trạng tồn kho theo danh mục" icon={Package} iconColor="text-orange-600" delay={0.2}>
+        <ChartCard
+          title="Tình trạng tồn kho theo danh mục"
+          icon={Package}
+          iconColor="text-orange-600"
+          delay={0.2}
+        >
           <div className="space-y-4">
-            {reportData.stockLevels.map((category: any) => (
-              <div key={category.category} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{category.category}</span>
-                  <span className="text-sm text-gray-500">{category.total} sản phẩm</span>
-                </div>
-                <div className="flex space-x-2">
-                  <div className="flex-1">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Bình thường</span>
-                      <span>{category.total - category.lowStock - category.outOfStock}</span>
+            {reportData.stockLevels && reportData.stockLevels.length > 0 ? (
+              reportData.stockLevels.map((category: any) => {
+                const total = category.total || 0;
+                const lowStock = category.lowStock || 0;
+                const outOfStock = category.outOfStock || 0;
+                const normal = total - lowStock - outOfStock;
+
+                return (
+                  <div key={category.category} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">
+                        {category.category || "Danh mục không xác định"}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {total} sản phẩm
+                      </span>
                     </div>
-                    <Progress
-                      value={((category.total - category.lowStock - category.outOfStock) / category.total) * 100}
-                      className="h-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Sắp hết</span>
-                      <span>{category.lowStock}</span>
+                    <div className="flex space-x-2">
+                      <div className="flex-1">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Bình thường</span>
+                          <span>{Math.max(0, normal)}</span>
+                        </div>
+                        <Progress
+                          value={
+                            total > 0 ? (Math.max(0, normal) / total) * 100 : 0
+                          }
+                          className="h-2"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Sắp hết</span>
+                          <span>{lowStock}</span>
+                        </div>
+                        <Progress
+                          value={total > 0 ? (lowStock / total) * 100 : 0}
+                          className="h-2 [&>div]:bg-yellow-500"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Hết hàng</span>
+                          <span>{outOfStock}</span>
+                        </div>
+                        <Progress
+                          value={total > 0 ? (outOfStock / total) * 100 : 0}
+                          className="h-2 [&>div]:bg-red-500"
+                        />
+                      </div>
                     </div>
-                    <Progress
-                      value={(category.lowStock / category.total) * 100}
-                      className="h-2 [&>div]:bg-yellow-500"
-                    />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Hết hàng</span>
-                      <span>{category.outOfStock}</span>
-                    </div>
-                    <Progress value={(category.outOfStock / category.total) * 100} className="h-2 [&>div]:bg-red-500" />
-                  </div>
-                </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Không có dữ liệu tồn kho</p>
               </div>
-            ))}
+            )}
           </div>
         </ChartCard>
 
-        <ChartCard title="Sản phẩm sắp hết hạn" icon={AlertTriangle} iconColor="text-red-600" delay={0.3}>
+        <ChartCard
+          title="Sản phẩm sắp hết hạn"
+          icon={AlertTriangle}
+          iconColor="text-red-600"
+          delay={0.3}
+        >
           <div className="space-y-3">
-            {reportData.expiringProducts.map((product: any) => (
-              <div key={product.name} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">{product.name}</p>
-                  <p className="text-sm text-gray-500">Tồn kho: {product.stock}</p>
+            {reportData.expiringProducts &&
+            reportData.expiringProducts.length > 0 ? (
+              reportData.expiringProducts.map((product: any) => (
+                <div
+                  key={product.name || Math.random()}
+                  className="flex items-center justify-between p-3 bg-red-50 rounded-lg"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {product.name || "Sản phẩm không xác định"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Tồn kho: {product.stock || 0}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <Badge
+                      variant={
+                        (product.daysLeft || 0) <= 30
+                          ? "destructive"
+                          : "secondary"
+                      }
+                    >
+                      {product.daysLeft || 0} ngày
+                    </Badge>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {product.expiryDate
+                        ? new Date(product.expiryDate).toLocaleDateString(
+                            "vi-VN"
+                          )
+                        : "Không xác định"}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <Badge variant={product.daysLeft <= 30 ? "destructive" : "secondary"}>{product.daysLeft} ngày</Badge>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(product.expiryDate).toLocaleDateString("vi-VN")}
-                  </p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Không có sản phẩm sắp hết hạn</p>
               </div>
-            ))}
+            )}
           </div>
         </ChartCard>
       </div>
 
-      <ChartCard title="Nhà cung cấp hàng đầu" icon={Truck} iconColor="text-indigo-600" delay={0.4}>
+      <ChartCard
+        title="Nhà cung cấp hàng đầu"
+        icon={Truck}
+        iconColor="text-indigo-600"
+        delay={0.4}
+      >
         <div className="space-y-4">
-          {reportData.topSuppliers.map((supplier: any, index: number) => (
-            <div key={supplier.name} className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-indigo-600">{index + 1}</span>
+          {reportData.topSuppliers && reportData.topSuppliers.length > 0 ? (
+            reportData.topSuppliers.map((supplier: any, index: number) => (
+              <div
+                key={supplier.name || index}
+                className="flex items-center justify-between"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-indigo-600">
+                      {index + 1}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {supplier.name || "Nhà cung cấp không xác định"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {supplier.activeContracts || 0} hợp đồng
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-gray-900">{supplier.name}</p>
-                  <p className="text-sm text-gray-500">{supplier.activeContracts} hợp đồng</p>
+                <div className="text-right">
+                  <p className="font-semibold text-indigo-600">
+                    {(supplier.totalPurchases || 0).toLocaleString()} ₫
+                  </p>
+                  <div className="flex items-center space-x-1">
+                    <span className="text-sm text-gray-500">Đánh giá:</span>
+                    <span className="text-sm font-medium text-yellow-600">
+                      {supplier.rating || 0}/5
+                    </span>
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-indigo-600">{supplier.totalPurchases.toLocaleString()} ₫</p>
-                <div className="flex items-center space-x-1">
-                  <span className="text-sm text-gray-500">Đánh giá:</span>
-                  <span className="text-sm font-medium text-yellow-600">{supplier.rating}/5</span>
-                </div>
-              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Truck className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>Không có dữ liệu nhà cung cấp</p>
             </div>
-          ))}
+          )}
         </div>
       </ChartCard>
     </div>
-  )
+  );
 }
 
 function FinancialAnalytics({ reportData }: { reportData: any }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard title="Lợi nhuận theo danh mục" icon={TrendingUp} iconColor="text-green-600" delay={0.2}>
+        <ChartCard
+          title="Lợi nhuận theo danh mục"
+          icon={TrendingUp}
+          iconColor="text-green-600"
+          delay={0.2}
+        >
           <div className="space-y-4">
-            {reportData.profitMargins.map((category: any) => (
-              <div key={category.category} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{category.category}</span>
-                  <Badge
-                    variant={category.margin >= 20 ? "default" : category.margin >= 10 ? "secondary" : "destructive"}
-                  >
-                    {category.margin}%
-                  </Badge>
-                </div>
-                <div className="text-sm text-gray-600">
-                  <div className="flex justify-between">
-                    <span>Doanh thu:</span>
-                    <span>{category.revenue.toLocaleString()} ₫</span>
+            {reportData.profitMargins && reportData.profitMargins.length > 0 ? (
+              reportData.profitMargins.map((category: any) => {
+                const margin = category.margin || 0;
+                const revenue = category.revenue || 0;
+                const cost = category.cost || 0;
+                const profit = category.profit || 0;
+
+                return (
+                  <div key={category.category} className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">
+                        {category.category || "Danh mục không xác định"}
+                      </span>
+                      <Badge
+                        variant={
+                          margin >= 20
+                            ? "default"
+                            : margin >= 10
+                            ? "secondary"
+                            : "destructive"
+                        }
+                      >
+                        {margin}%
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Doanh thu:</span>
+                        <span>{revenue.toLocaleString()} ₫</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Chi phí:</span>
+                        <span>{cost.toLocaleString()} ₫</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span>Lợi nhuận:</span>
+                        <span className="text-green-600">
+                          {profit.toLocaleString()} ₫
+                        </span>
+                      </div>
+                    </div>
+                    <Progress
+                      value={Math.max(0, Math.min(100, margin))}
+                      className="h-2"
+                    />
                   </div>
-                  <div className="flex justify-between">
-                    <span>Chi phí:</span>
-                    <span>{category.cost.toLocaleString()} ₫</span>
-                  </div>
-                  <div className="flex justify-between font-semibold">
-                    <span>Lợi nhuận:</span>
-                    <span className="text-green-600">{category.profit.toLocaleString()} ₫</span>
-                  </div>
-                </div>
-                <Progress value={category.margin} className="h-2" />
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Không có dữ liệu lợi nhuận</p>
               </div>
-            ))}
+            )}
           </div>
         </ChartCard>
 
-        <ChartCard title="Công nợ quá hạn" icon={AlertTriangle} iconColor="text-red-600" delay={0.3}>
+        <ChartCard
+          title="Công nợ quá hạn"
+          icon={AlertTriangle}
+          iconColor="text-red-600"
+          delay={0.3}
+        >
           <div className="space-y-3">
-            {reportData.outstandingPayments.length > 0 ? (
+            {reportData.outstandingPayments &&
+            reportData.outstandingPayments.length > 0 ? (
               reportData.outstandingPayments.map((payment: any) => (
-                <div key={payment.supplier} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                <div
+                  key={payment.supplier || Math.random()}
+                  className="flex items-center justify-between p-3 bg-red-50 rounded-lg"
+                >
                   <div>
-                    <p className="font-medium text-gray-900">{payment.supplier}</p>
-                    <p className="text-sm text-gray-500">Quá hạn {payment.daysOverdue} ngày</p>
+                    <p className="font-medium text-gray-900">
+                      {payment.supplier || "Nhà cung cấp không xác định"}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Quá hạn {payment.daysOverdue || 0} ngày
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-red-600">{payment.amount.toLocaleString()} ₫</p>
+                    <p className="font-semibold text-red-600">
+                      {(payment.amount || 0).toLocaleString()} ₫
+                    </p>
                     <Badge variant="destructive">Quá hạn</Badge>
                   </div>
                 </div>
@@ -351,25 +579,25 @@ function FinancialAnalytics({ reportData }: { reportData: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600 mb-2">
-                {reportData.kpis.totalRevenue.toLocaleString()} ₫
+                {(reportData.kpis?.totalRevenue || 0).toLocaleString()} ₫
               </div>
               <p className="text-sm text-gray-600">Tổng doanh thu</p>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600 mb-2">
-                {reportData.kpis.grossProfitMargin.toFixed(1)}%
+                {(reportData.kpis?.grossProfitMargin || 0).toFixed(1)}%
               </div>
               <p className="text-sm text-gray-600">Tỷ suất lợi nhuận gộp</p>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-orange-600 mb-2">
-                {reportData.kpis.operatingExpenses.toLocaleString()} ₫
+                {(reportData.kpis?.operatingExpenses || 0).toLocaleString()} ₫
               </div>
               <p className="text-sm text-gray-600">Chi phí hoạt động</p>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600 mb-2">
-                {reportData.kpis.netProfit.toLocaleString()} ₫
+                {(reportData.kpis?.netProfit || 0).toLocaleString()} ₫
               </div>
               <p className="text-sm text-gray-600">Lợi nhuận ròng</p>
             </div>
@@ -377,60 +605,62 @@ function FinancialAnalytics({ reportData }: { reportData: any }) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 export default function ReportsPage() {
-  const { reportData, loading, generateReports, exportReport } = useReports()
-  const { toast } = useToast()
-  const [selectedPeriod, setSelectedPeriod] = useState("30days")
-  const [startDate, setStartDate] = useState("")
-  const [endDate, setEndDate] = useState("")
-  const [activeTab, setActiveTab] = useState("overview")
+  const { reportData, loading, generateReports, exportReport } = useReports();
+  const { toast } = useToast();
+  const [selectedPeriod, setSelectedPeriod] = useState("30days");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     // Set default date range
-    const now = new Date()
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-    setEndDate(now.toISOString().split("T")[0])
-    setStartDate(thirtyDaysAgo.toISOString().split("T")[0])
-  }, [])
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    setEndDate(now.toISOString().split("T")[0]);
+    setStartDate(thirtyDaysAgo.toISOString().split("T")[0]);
+  }, []);
 
   const handlePeriodChange = async (period: string) => {
-    setSelectedPeriod(period)
+    setSelectedPeriod(period);
 
-    const now = new Date()
-    let start: Date
+    const now = new Date();
+    let start: Date;
 
     switch (period) {
       case "7days":
-        start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-        break
+        start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
       case "30days":
-        start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-        break
+        start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
       case "90days":
-        start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
-        break
+        start = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
       case "1year":
-        start = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
-        break
+        start = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
       default:
-        start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     }
 
-    const startStr = start.toISOString().split("T")[0]
-    const endStr = now.toISOString().split("T")[0]
+    const startStr = start.toISOString().split("T")[0];
+    const endStr = now.toISOString().split("T")[0];
 
-    setStartDate(startStr)
-    setEndDate(endStr)
+    setStartDate(startStr);
+    setEndDate(endStr);
 
-    await generateReports(startStr, endStr)
+    await generateReports(startStr, endStr);
     toast({
       title: "Báo cáo đã được cập nhật",
-      description: `Dữ liệu từ ${start.toLocaleDateString("vi-VN")} đến ${now.toLocaleDateString("vi-VN")}`,
-    })
-  }
+      description: `Dữ liệu từ ${start.toLocaleDateString(
+        "vi-VN"
+      )} đến ${now.toLocaleDateString("vi-VN")}`,
+    });
+  };
 
   const handleCustomDateRange = async () => {
     if (!startDate || !endDate) {
@@ -438,50 +668,52 @@ export default function ReportsPage() {
         title: "Lỗi",
         description: "Vui lòng chọn ngày bắt đầu và kết thúc",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    await generateReports(startDate, endDate)
+    await generateReports(startDate, endDate);
     toast({
       title: "Báo cáo đã được cập nhật",
-      description: `Dữ liệu từ ${new Date(startDate).toLocaleDateString("vi-VN")} đến ${new Date(endDate).toLocaleDateString("vi-VN")}`,
-    })
-  }
+      description: `Dữ liệu từ ${new Date(startDate).toLocaleDateString(
+        "vi-VN"
+      )} đến ${new Date(endDate).toLocaleDateString("vi-VN")}`,
+    });
+  };
 
   const handleExport = (reportType: string) => {
-    if (!reportData) return
+    if (!reportData) return;
 
-    let data: any[] = []
-    let filename = ""
+    let data: any[] = [];
+    let filename = "";
 
     switch (reportType) {
       case "sales":
-        data = reportData.dailySales
-        filename = "bao-cao-ban-hang"
-        break
+        data = reportData.dailySales;
+        filename = "bao-cao-ban-hang";
+        break;
       case "products":
-        data = reportData.topProducts
-        filename = "san-pham-ban-chay"
-        break
+        data = reportData.topProducts;
+        filename = "san-pham-ban-chay";
+        break;
       case "inventory":
-        data = reportData.stockLevels
-        filename = "ton-kho"
-        break
+        data = reportData.stockLevels;
+        filename = "ton-kho";
+        break;
       case "financial":
-        data = reportData.profitMargins
-        filename = "loi-nhuan"
-        break
+        data = reportData.profitMargins;
+        filename = "loi-nhuan";
+        break;
       default:
-        return
+        return;
     }
 
-    exportReport(filename, data)
+    exportReport(filename, data);
     toast({
       title: "Xuất báo cáo thành công",
       description: `File ${filename}.csv đã được tải xuống`,
-    })
-  }
+    });
+  };
 
   if (loading && !reportData) {
     return (
@@ -493,7 +725,7 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!reportData) {
@@ -501,12 +733,14 @@ export default function ReportsPage() {
       <div className="p-6">
         <div className="text-center py-12">
           <BarChart3 className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Không có dữ liệu báo cáo</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Không có dữ liệu báo cáo
+          </h3>
           <p className="text-gray-600 mb-4">Vui lòng thử lại sau</p>
           <Button onClick={() => generateReports()}>Tạo báo cáo</Button>
         </div>
       </div>
-    )
+    );
   }
 
   const headerActions = (
@@ -546,12 +780,16 @@ export default function ReportsPage() {
           <SelectItem value="1year">1 năm</SelectItem>
         </SelectContent>
       </Select>
-      <Button variant="outline" onClick={() => handleExport(activeTab)} disabled={loading}>
+      <Button
+        variant="outline"
+        onClick={() => handleExport(activeTab)}
+        disabled={loading}
+      >
         <FileDown className="w-4 h-4 mr-2" />
         Xuất báo cáo
       </Button>
     </div>
-  )
+  );
 
   return (
     <div className="p-6">
@@ -563,7 +801,11 @@ export default function ReportsPage() {
 
       <KPISection kpis={reportData.kpis} />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
@@ -573,11 +815,17 @@ export default function ReportsPage() {
             <TrendingUp className="w-4 h-4" />
             <span>Bán hàng</span>
           </TabsTrigger>
-          <TabsTrigger value="inventory" className="flex items-center space-x-2">
+          <TabsTrigger
+            value="inventory"
+            className="flex items-center space-x-2"
+          >
             <Package className="w-4 h-4" />
             <span>Kho hàng</span>
           </TabsTrigger>
-          <TabsTrigger value="financial" className="flex items-center space-x-2">
+          <TabsTrigger
+            value="financial"
+            className="flex items-center space-x-2"
+          >
             <DollarSign className="w-4 h-4" />
             <span>Tài chính</span>
           </TabsTrigger>
@@ -585,46 +833,108 @@ export default function ReportsPage() {
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ChartCard title="Xu hướng doanh thu" icon={TrendingUp} iconColor="text-blue-600" delay={0.2}>
+            <ChartCard
+              title="Xu hướng doanh thu"
+              icon={TrendingUp}
+              iconColor="text-blue-600"
+              delay={0.2}
+            >
               <div className="space-y-4">
-                {reportData.monthlySales.slice(-6).map((data: any) => (
-                  <div key={data.month} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-8 bg-blue-100 rounded flex items-center justify-center">
-                        <span className="text-sm font-semibold text-blue-600">T{data.month.split("-")[1]}</span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{data.revenue.toLocaleString()} ₫</p>
-                        <p className="text-sm text-gray-500">{data.orders} đơn hàng</p>
-                      </div>
-                    </div>
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${(data.revenue / Math.max(...reportData.monthlySales.map((d: any) => d.revenue))) * 100}%`,
-                        }}
-                      />
-                    </div>
+                {reportData.monthlySales &&
+                reportData.monthlySales.length > 0 ? (
+                  reportData.monthlySales
+                    .slice(-6)
+                    .map((data: any, index: number) => {
+                      // Get month number from YYYY-MM format
+                      const monthParts = data.month.split("-");
+                      const monthNumber =
+                        monthParts.length > 1 ? monthParts[1] : data.month;
+                      const year =
+                        monthParts.length > 1
+                          ? monthParts[0]
+                          : new Date().getFullYear();
+
+                      // Calculate max revenue for progress bar
+                      const maxRevenue = Math.max(
+                        ...reportData.monthlySales.map(
+                          (d: any) => d.revenue || 0
+                        )
+                      );
+                      const progressWidth =
+                        maxRevenue > 0 ? (data.revenue / maxRevenue) * 100 : 0;
+
+                      return (
+                        <div
+                          key={data.month || index}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-8 bg-blue-100 rounded flex items-center justify-center">
+                              <span className="text-sm font-semibold text-blue-600">
+                                T{monthNumber}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">
+                                {(data.revenue || 0).toLocaleString()} ₫
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {data.orders || 0} đơn hàng
+                              </p>
+                            </div>
+                          </div>
+                          <div className="w-24 bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                              style={{
+                                width: `${progressWidth}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Không có dữ liệu doanh thu theo tháng</p>
                   </div>
-                ))}
+                )}
               </div>
             </ChartCard>
 
-            <ChartCard title="Phân khúc khách hàng" icon={Users} iconColor="text-purple-600" delay={0.3}>
+            <ChartCard
+              title="Phân khúc khách hàng"
+              icon={Users}
+              iconColor="text-purple-600"
+              delay={0.3}
+            >
               <div className="grid grid-cols-1 gap-4">
-                {reportData.customerSegments.map((segment: any, index: number) => (
-                  <div key={segment.segment} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{segment.segment}</h3>
-                      <p className="text-sm text-gray-600">{segment.count} khách hàng</p>
+                {reportData.customerSegments.map(
+                  (segment: any, index: number) => (
+                    <div
+                      key={segment.segment}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    >
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {segment.segment}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {segment.count} khách hàng
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-purple-600">
+                          {segment.percentage}%
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          {segment.revenue.toLocaleString()} ₫
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-purple-600">{segment.percentage}%</div>
-                      <p className="text-sm text-gray-500">{segment.revenue.toLocaleString()} ₫</p>
-                    </div>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
             </ChartCard>
           </div>
@@ -643,5 +953,5 @@ export default function ReportsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

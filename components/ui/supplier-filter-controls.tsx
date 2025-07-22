@@ -60,7 +60,7 @@ export function SupplierFilterControls({
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="all">Tất cả trạng thái</SelectItem>
               <SelectItem value="active">Hoạt động</SelectItem>
               <SelectItem value="inactive">Ngừng hợp tác</SelectItem>
             </SelectContent>
@@ -72,7 +72,7 @@ export function SupplierFilterControls({
               <SelectValue placeholder="Loại hình KD" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="all">Tất cả loại hình KD</SelectItem>
               {businessTypes?.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
@@ -87,7 +87,7 @@ export function SupplierFilterControls({
               <SelectValue placeholder="Điều kiện TT" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="all">Tất cả điều kiện TT</SelectItem>
               {paymentTerms?.map((term) => (
                 <SelectItem key={term} value={term}>
                   {term}

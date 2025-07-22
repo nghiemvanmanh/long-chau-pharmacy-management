@@ -247,14 +247,14 @@ export default function AccountsPage() {
       render: (value: string[]) => {
         return (
           <div className="space-y-1">
-            {value.slice(0, 2).map((permission, index) => (
+            {value?.slice(0, 2).map((permission, index) => (
               <Badge key={index} variant="outline" className="text-xs mr-1">
                 {PERMISSION_LABELS[permission] || permission}
               </Badge>
             ))}
-            {value.length > 2 && (
+            {value?.length > 2 && (
               <Badge variant="outline" className="text-xs">
-                +{value.length - 2} khác
+                +{value?.length - 2} khác
               </Badge>
             )}
           </div>
